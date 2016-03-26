@@ -1,0 +1,136 @@
+/*******************************************************************************
+ *  Copyright 2012-2015 Qualcomm Technologies International, Ltd.
+ *  Part of CSR uEnergy SDK 2.5.1
+ *  Application version 2.5.1.0
+ *
+ *  FILE
+ *      hid_service_db.db
+ *
+ *  DESCRIPTION
+ *      This file defines the HID Service in JSON format.
+ *      This file is included in the main application data base file
+ *      which is used to produce ATT flat data base.
+ *
+ ******************************************************************************/
+#ifndef __HID_SERVICE_DB__
+#define __HID_SERVICE_DB__
+
+#include "hid_uuids.h"
+#include "user_config.h"
+
+/* For service details, refer http://developer.bluetooth.org/gatt/services/
+ * Pages/ServiceViewer.aspx?u=org.bluetooth.service.human_interface_device.xml
+ */
+
+/* Primary service declaration of HID service. */
+primary_service {
+    uuid : HID_SERVICE_UUID,
+    name : "HID_SERVICE",
+    
+    /* HID Information characteristic. */
+    characteristic {
+        uuid : HID_INFORMATION_UUID,
+        properties : read,
+        name  : "HID_INFORMATION",
+        flags : [FLAG_IRQ, FLAG_ENCR_R]
+    },
+    
+    /* Report map(report descriptor) characteristic. */
+    characteristic {
+        uuid : HID_REPORT_MAP_UUID,
+        name  : "HID_REPORT_MAP",
+        properties : read,
+        flags : [FLAG_IRQ, FLAG_ENCR_R]
+    },
+    
+    /* Input report characteristic */
+    characteristic {
+        uuid : HID_REPORT_UUID,
+        name : "HID_INPUT_REPORT",
+        flags : [FLAG_IRQ, FLAG_ENCR_R],
+        properties : [read, notify],
+        /* Size of input report in report mode. The size depends upon the report
+         * descriptor being used by the mouse.
+         *
+         * Present structure of mouse Input Report 
+         * Byte 0       - Button press.
+         * Byte 1 and 2 - Delta-X.
+         * Byte 3 and 4 - Delta-Y.
+         * Byte 5       - Delta-Z(wheel)
+         */                  
+        size_value : 13,
+        
+        client_config {
+            flags : [FLAG_IRQ, FLAG_ENCR_W],
+            name : "HID_INPUT_RPT_CLIENT_CONFIG"
+            },
+            
+        raw {
+        /* 0xe002, uuid, properties, value */
+        
+        /* In 0xe002, 'e'(most significant four bits) stands as identifier to
+         * identify attributes like HID Report reference descriptor,
+         * The next four bits(0 here) identify the flags for this attribute.
+         * flags*
+         * 0x0 - Unsecure(can be written to over an unencrypted link)
+         * 0x1 - Encryption protected for write operations.
+         * 0x2 - Authentication protected(MITM protection) for write operations.
+         * 0x3 - reserved.
+         * The next byte(02 here) represents the length of the 'value' field.
+         */
+        /* 'properties' field is a bit-field.
+         * Broadcast               - 0x01 permits broadcasts 
+         * Read                    - 0x02 permits reads 
+         * Write Without Response  - 0x04 permit writes without response 
+         * Write                   - 0x08 permits writes 
+         * Notify                  - 0x10 permits notifications
+         * Indicate                - 0x20 permits indications
+         * Auth'd Signed Writes    - 0x40 permits signed writes
+         * Extended Properties     - 0x80 additional characteristic properties are defined
+         */
+        value: [0xe002, HID_REPORT_REFERENCE_UUID, 0x0002, 0x0101] /* Report ID - 0,
+                                                                    * Report Type - 1 (Input)
+                                                                    */
+        }
+    },
+    
+    /* Feature report characteristic */
+    characteristic {
+        uuid : HID_REPORT_UUID,
+        name : "HID_FEATURE_REPORT",
+        flags : [FLAG_IRQ, FLAG_ENCR_R, FLAG_ENCR_W],
+        properties : [read, write],
+        size_value : 1,
+            
+        raw {
+            /* 0xe002, uuid, properties, value */
+            value: [0xe002, HID_REPORT_REFERENCE_UUID, 0x0002, 0x0003] /* Report ID - 0,
+                                                                        * Report Type - 3 (Feature)
+                                                                        */
+        },
+        
+        user_description {
+            value : "BLE MOUSE RESOLUTION IN CPI\n 0 = 400\n 1 = 800\n 2 = 1200\n 3 = 1600"
+        } 
+    },
+    
+    /* HID control point characteristic. */
+    characteristic {
+        uuid : HID_CONTROL_POINT_UUID,
+        name : "HID_CONTROL_POINT",
+        flags : [FLAG_IRQ, FLAG_ENCR_W],
+        properties : write_cmd,
+        value : 0x00
+    },
+    
+    /* Protocol mode characteristic. */
+    characteristic {
+        uuid : HID_PROTOCOL_MODE_UUID,
+        name : "HID_PROTOCOL_MODE",
+        flags : [FLAG_IRQ, FLAG_ENCR_R, FLAG_ENCR_W],
+        properties : [read, write_cmd],
+        value : 0x00
+    }   
+},
+#endif /* __HID_SERVICE_DB__ */
+

@@ -1,0 +1,52 @@
+# Object files
+*.o
+*.ko
+
+# Libraries
+*.lib
+*.a
+*.rar
+*.zip
+*.7z
+*.xz
+*.gz
+*.bz*
+*.tar*
+*.html
+*.app
+*.map
+*.fs
+*.swp
+*.xap
+*.sym
+merge.*
+image/
+*_db.h
+*_db.c
+*_db.db_
+
+#
+*.dbg
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+
+GPATH
+GRTAGS
+GTAGS
+tags
+
+default
+depend
+goods/
+lib/
+include/
+tools
